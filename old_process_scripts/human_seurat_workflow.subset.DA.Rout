@@ -1,0 +1,103 @@
+
+R version 4.3.1 (2023-06-16) -- "Beagle Scouts"
+Copyright (C) 2023 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(tidyr)
+> library(Seurat)
+Loading required package: SeuratObject
+Loading required package: sp
+
+Attaching package: ‘SeuratObject’
+
+The following objects are masked from ‘package:base’:
+
+    intersect, t
+
+> library(SeuratObject)
+> library(future)
+> 
+> #setting new global max size for memory to 50GiB:
+> plan(multisession, workers = 4)
+> options(future.globals.maxSize = 200 * 1024^3) 
+> 
+> #Loading in the Seurat Object:
+> load("/stor/work/FRI-BigDataBio/alcohol_addiction_transcriptomics/human_seurat_workflow/seurat.merged_v4.Rdata")
+> 
+> #data normalization
+> 
+> #human.combined <- NormalizeData(human.combined)
+> #human.combined <- ScaleData(human.combined)
+> 
+> #getting the metadata into frame:
+> #human_meta_data <- human.combined@meta.data
+> 
+> #human_meta_data$cell_names <- rownames(human_meta_data)
+> 
+> # Split the cell_names column into 'sample_id' and 'cell_barcode'
+> #human_meta_data <- separate(human_meta_data, cell_names, into = c("sample_id", "cell_barcode"), sep = "_")
+> 
+> #human.combined@meta.data <- human_meta_data
+> 
+> #changing rownames in meta.data
+> 
+> cell_meta_rownames <- Cells(human.combined) #character class type
+> 
+> #assign this vector as rownames
+> rownames(human.combined@meta.data) <- cell_meta_rownames
+> 
+> ####NORMALIZATION
+> 
+> #filtering out missing genes:
+> # Step 1: Check for feature names in the Seurat object
+> #head(rownames(human.combined))
+> 
+> # Step 2: Convert gene lists to uppercase if needed (adjust as necessary)
+> #s.genes <- toupper(cc.genes$s.genes)
+> #g2m.genes <- toupper(cc.genes$g2m.genes)
+> 
+> #s.genes <- s.genes[s.genes %in% rownames(human.combined)]
+> #g2m.genes <- g2m.genes[g2m.genes %in% rownames(human.combined)]
+> 
+> #s.genes <- cc.genes$s.genes
+> #g2m.genes <- cc.genes$g2m.genes
+> #human.combined <- CellCycleScoring(human.combined, s.features = s.genes, g2m.features = g2m.genes, set.ident = TRUE)
+> #human.combined$CC.Difference <- human.combined$S.Score - human.combined$G2M.Score
+> 
+> human.combined <- SCTransform(human.combined, vars.to.regress = "CC.Difference", ncells = 1000, variable.features.n = 1500)
+Running SCTransform on assay: RNA
+vst.flavor='v2' set. Using model with fixed slope and excluding poisson genes.
+`vst.flavor` is set to 'v2' but could not find glmGamPoi installed.
+Please install the glmGamPoi package for much faster estimation.
+--------------------------------------------
+install.packages('BiocManager')
+BiocManager::install('glmGamPoi')
+--------------------------------------------
+Falling back to native (slower) implementation.
+
+Calculating cell attributes from input UMI matrix: log_umi
+Variance stabilizing transformation of count matrix of size 43551 by 296130
+Model formula is y ~ log_umi
+Get Negative Binomial regression parameters per gene
+Using 2000 genes, 1000 cells
+Found 383 outliers - those will be ignored in fitting/regularization step
+
+Second step: Get residuals using fitted parameters for 43551 genes
+Computing corrected count matrix for 43551 genes
+Error: cannot allocate vector of size 96.1 Gb
+In addition: There were 50 or more warnings (use warnings() to see the first 50)
+Execution halted
