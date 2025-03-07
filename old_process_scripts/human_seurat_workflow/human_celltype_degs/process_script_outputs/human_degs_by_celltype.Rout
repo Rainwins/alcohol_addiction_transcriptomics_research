@@ -1,0 +1,245 @@
+
+R version 4.3.1 (2023-06-16) -- "Beagle Scouts"
+Copyright (C) 2023 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(Seurat)
+Loading required package: SeuratObject
+Loading required package: sp
+
+Attaching package: ‘SeuratObject’
+
+The following objects are masked from ‘package:base’:
+
+    intersect, t
+
+> #library(SeuratData)
+> load("/stor/work/FRI-BigDataBio/alcohol_addiction_transcriptomics/human_seurat_workflow/suerat.merged.scsorter.umap.RData")
+> 
+> #Finding DEGs by condition for each celltype cluster
+> human.combined$celltype.condition <- paste(human.combined$sorted_cells, human.combined$orig.ident, sep = "_")
+> Idents(human.combined) <- "celltype.condition"
+> 
+> list_of_celltypes <- unique(human.combined$sorted_cells)
+> 
+> list_of_celltype_DEGs <- c()
+> 
+> #for each cell type:
+> for (cell_type in list_of_celltypes){
++   
++   # Create identifiers for each cell type and condition
++   ident_aud <- paste0(cell_type, "_AUD")
++   ident_control <- paste0(cell_type, "_control")
++   
++   # Find markers between conditions for each cell type
++   mono.de <- FindMarkers(human.combined, ident.1 = ident_aud, ident.2 = ident_control, verbose = FALSE)
++   
++   # Store results in the list with the cell type as the key
++   list_of_celltype_DEGs[[cell_type]] <- mono.de
++   
++ }
+> 
+> save(list_of_celltype_DEGs, file = "list_of_celltype_DEGs.RData")
+> # Display the first few results for each cell type
+> lapply(list_of_celltype_DEGs, head, n = 10)
+$Unknown
+         p_val avg_log2FC pct.1 pct.2 p_val_adj
+MTATP6P1     0  -3.310877 0.124 0.443         0
+MT-ND3       0  -4.103549 0.367 0.677         0
+MT-ATP6      0  -3.640444 0.389 0.689         0
+MT-ND4L      0  -2.214573 0.215 0.496         0
+MT-ND2       0  -2.585232 0.418 0.672         0
+MT-ND1       0  -3.026976 0.460 0.689         0
+MT-CYB       0  -3.025028 0.497 0.712         0
+MT-ND4       0  -3.223959 0.506 0.720         0
+MT-CO2       0  -2.967462 0.568 0.749         0
+MT-CO3       0  -3.401148 0.586 0.764         0
+
+$`Gabaergic Neuron`
+         p_val avg_log2FC pct.1 pct.2 p_val_adj
+MT-ND3       0 -2.2680682 0.383 0.655         0
+MT-ATP6      0 -1.9951019 0.431 0.687         0
+CST3         0 -1.4631622 0.249 0.502         0
+APOE         0 -1.8471809 0.122 0.356         0
+MTATP6P1     0 -2.1290778 0.088 0.306         0
+MT-ND1       0 -1.2140151 0.522 0.733         0
+MT-ND2       0 -0.9752319 0.480 0.691         0
+MT-ND4L      0 -1.0501001 0.209 0.419         0
+MT-CYB       0 -1.3312660 0.558 0.760         0
+MT-ND4       0 -1.4856220 0.580 0.764         0
+
+$Neuron
+                  p_val avg_log2FC pct.1 pct.2     p_val_adj
+KIF5C-AS1  0.000000e+00  3.0499309 0.270 0.055  0.000000e+00
+APOE       0.000000e+00 -1.4709076 0.088 0.237  0.000000e+00
+MT-ND3     0.000000e+00 -1.4350007 0.555 0.682  0.000000e+00
+BCYRN1     0.000000e+00 -0.5940231 0.843 0.903  0.000000e+00
+MT-ATP6   5.940103e-239 -1.0892992 0.638 0.724 3.983552e-234
+CST3      5.684937e-237 -1.0294316 0.207 0.357 3.812432e-232
+MT-CYB    1.765843e-233 -0.7872391 0.741 0.809 1.184210e-228
+MT-CO3    2.732136e-218 -0.8488513 0.863 0.886 1.832225e-213
+SLC1A2    3.662189e-186 -0.7737082 0.270 0.408 2.455937e-181
+SNAP25    3.020588e-176  0.3565875 0.904 0.868 2.025667e-171
+
+$Astrocyte
+        p_val avg_log2FC pct.1 pct.2 p_val_adj
+MT-ND3      0 -1.3421448 0.469 0.803         0
+MT-ATP6     0 -1.2011718 0.523 0.820         0
+APOE        0 -1.3153738 0.343 0.624         0
+MT-ND2      0 -0.7171586 0.512 0.775         0
+MT-ND1      0 -0.8171536 0.573 0.825         0
+CST3        0 -1.1345153 0.477 0.727         0
+MT-CYB      0 -0.8164932 0.604 0.849         0
+MT-ND4      0 -0.8485097 0.629 0.869         0
+MT-ND4L     0 -0.7369261 0.230 0.464         0
+MT-ND5      0 -0.4942906 0.455 0.689         0
+
+$`Intercellular Microglia`
+                  p_val avg_log2FC pct.1 pct.2     p_val_adj
+KIF5C-AS1 2.623439e-240  5.1566614 0.273 0.040 1.759331e-235
+MT-ATP6   3.339100e-186 -1.0014554 0.787 0.925 2.239267e-181
+MT-ND3    1.175817e-178 -1.0697939 0.763 0.900 7.885264e-174
+MT-CO3    1.173897e-154 -0.8840535 0.923 0.977 7.872386e-150
+MT-CYB    6.268835e-124 -0.8001502 0.858 0.936 4.204006e-119
+MT-ND4    2.867198e-116 -0.7064174 0.863 0.948 1.922800e-111
+TRPM3      1.036889e-90 -2.6872188 0.152 0.329  6.953586e-86
+MT-ND1     2.666000e-84 -0.5305702 0.794 0.909  1.787873e-79
+NEFL       5.447666e-83  0.9027619 0.522 0.320  3.653314e-78
+NEFM       6.175234e-79  1.0282470 0.377 0.195  4.141235e-74
+
+$`Mature Non-myelinating Oligodendrocyte`
+                  p_val avg_log2FC pct.1 pct.2    p_val_adj
+MAP1B      4.398299e-34  0.4104397 0.865 0.759 2.949588e-29
+FP236383.3 1.021408e-28  0.4070883 0.750 0.596 6.849769e-24
+YWHAG      3.394526e-26  0.6002347 0.486 0.350 2.276437e-21
+MT-ND3     5.770443e-26 -1.4104223 0.305 0.418 3.869775e-21
+CALM1      6.250659e-23  0.3899992 0.802 0.685 4.191817e-18
+UCHL1      8.757826e-22  0.5426890 0.437 0.313 5.873174e-17
+MTATP6P1   1.098407e-21 -1.4174517 0.052 0.122 7.366140e-17
+AC060765.2 1.814958e-21 -1.3786697 0.105 0.190 1.217147e-16
+MT-ND6     2.898029e-20  1.2891205 0.135 0.058 1.943476e-15
+KIF5C-AS1  3.086955e-20  2.2243390 0.093 0.031 2.070174e-15
+
+$`Glutamatergic Neuron`
+         p_val avg_log2FC pct.1 pct.2 p_val_adj
+APOE         0 -1.9795828 0.137 0.398         0
+MT-ND3       0 -2.0579841 0.413 0.669         0
+CST3         0 -1.6838987 0.277 0.516         0
+MT-ATP6      0 -1.8098914 0.466 0.696         0
+MTATP6P1     0 -1.7743982 0.112 0.324         0
+MAPT.1       0 -0.6878610 0.277 0.482         0
+MT-ND2       0 -0.9448361 0.502 0.706         0
+MT-ND4L      0 -1.1463803 0.224 0.424         0
+DPH6-DT      0 -0.7222243 0.526 0.719         0
+MT-CYB       0 -1.0439441 0.590 0.781         0
+
+$`Dopaminergic Neuron`
+                 p_val avg_log2FC pct.1 pct.2     p_val_adj
+APOE      0.000000e+00  -2.180930 0.126 0.385  0.000000e+00
+MT-ND3    0.000000e+00  -2.207729 0.426 0.673  0.000000e+00
+MT-ATP6   0.000000e+00  -1.954378 0.475 0.689  0.000000e+00
+MT-CO3   8.617352e-298  -1.401164 0.732 0.868 5.778969e-293
+MT-ND4   3.446710e-286  -1.411064 0.626 0.782 2.311432e-281
+MT-CYB   1.052341e-282  -1.309024 0.619 0.793 7.057208e-278
+CST3     9.422161e-273  -1.774654 0.277 0.517 6.318689e-268
+MTATP6P1 4.837813e-264  -2.133955 0.096 0.294 3.244334e-259
+MT-ND1   1.088200e-258  -1.242364 0.582 0.764 7.297687e-254
+XIST     1.443951e-254   2.999809 0.211 0.027 9.683427e-250
+
+$Microglia
+                   p_val avg_log2FC pct.1 pct.2     p_val_adj
+AC011586.2  0.000000e+00 -7.2305445 0.007 0.326  0.000000e+00
+MSR1       4.331983e-138 -1.6165046 0.238 0.487 2.905114e-133
+ARHGAP15    7.156109e-94 -0.8170105 0.541 0.730  4.799030e-89
+RNF150      1.986319e-72 -1.0249312 0.233 0.424  1.332066e-67
+SLC9A9      2.315365e-64 -0.4796362 0.732 0.838  1.552730e-59
+LINC02232   8.273960e-56 -0.6778433 0.406 0.576  5.548683e-51
+MS4A6A      8.114203e-55 -1.1347059 0.089 0.218  5.441547e-50
+LINC01684   7.497203e-54 -1.2574334 0.073 0.193  5.027774e-49
+MT-ND3      1.101684e-49 -0.8411590 0.338 0.507  7.388112e-45
+APOE        1.537549e-49 -0.9880932 0.155 0.297  1.031111e-44
+
+$`Mature Myelinating Oligodendrocyte`
+          p_val avg_log2FC pct.1 pct.2 p_val_adj
+SYT1          0  0.7808394 0.900 0.644         0
+KANSL1.1      0 -2.2641409 0.049 0.299         0
+MT-ND3        0 -1.2662342 0.284 0.528         0
+XIST          0 -2.4909686 0.053 0.292         0
+MAPT.1        0 -2.2266253 0.042 0.274         0
+MARCKSL1      0 -1.0990817 0.251 0.481         0
+CCDC144CP     0 -0.8645475 0.213 0.423         0
+NRGN          0  0.8198058 0.698 0.494         0
+ERMN          0 -0.5816083 0.339 0.541         0
+SNAP25        0  0.7882567 0.743 0.541         0
+
+$`Cholinergic Neuron`
+                 p_val avg_log2FC pct.1 pct.2 p_val_adj
+AKAP6     0.0004312058  -1.261290 0.366 0.660         1
+ARFIP1    0.0008690181  -6.729605 0.000 0.149         1
+HPCA      0.0013020444   5.966226 0.197 0.000         1
+CST3      0.0016337242  -2.498227 0.085 0.298         1
+LINC00342 0.0018423315   4.009384 0.225 0.021         1
+OLA1      0.0020162959   2.498080 0.296 0.064         1
+CRB1      0.0021512927  -6.595608 0.000 0.128         1
+C18orf25  0.0024171538   2.985428 0.225 0.021         1
+COA1      0.0027628154   4.546391 0.211 0.021         1
+PPP3CB    0.0029725502   1.968404 0.296 0.064         1
+
+$`Glycinergic Neuron`
+                  p_val avg_log2FC pct.1 pct.2 p_val_adj
+RBM10      2.175238e-05  -3.175440 0.043 0.438         1
+ETV6       2.311093e-05  -1.348226 0.404 0.875         1
+ZNF804A    5.039486e-05  -4.985302 0.000 0.312         1
+ATF3       1.336536e-04  -5.791051 0.000 0.281         1
+CPPED1     3.481072e-04  -5.254238 0.000 0.250         1
+HLA-C.4    3.481072e-04  -4.694437 0.000 0.250         1
+AC006059.1 3.957591e-04  -2.804170 0.085 0.406         1
+RBX1       5.287425e-04  -2.711282 0.064 0.375         1
+MYNN       5.312592e-04  -2.815237 0.043 0.344         1
+MGST2      5.531697e-04  -1.735214 0.149 0.531         1
+
+$`Serotonergic Neuron`
+              p_val avg_log2FC pct.1 pct.2 p_val_adj
+RAPGEF4 0.001306708  -5.280898 0.000 0.590         1
+ZNF91   0.001306708  -4.928504 0.000 0.590         1
+TCF4    0.001466296  -2.099680 0.273 0.821         1
+DGKB    0.002375007   0.901632 1.000 0.615         1
+KIF3C   0.002684878  -4.404532 0.000 0.538         1
+ARAP2   0.002684878  -4.830690 0.000 0.538         1
+ATP8A1  0.002684878  -4.950015 0.000 0.538         1
+ERC1    0.002684878  -5.029985 0.000 0.538         1
+AEBP2   0.002684878  -4.932808 0.000 0.538         1
+FAM49A  0.003780178  -4.612334 0.000 0.513         1
+
+$`Oligodendrocyte Precursor`
+               p_val avg_log2FC pct.1 pct.2     p_val_adj
+MT-ND3 6.708088e-189 -1.4735925 0.330 0.652 4.498578e-184
+MALAT1 1.143786e-186  0.3124557 1.000 1.000 7.670460e-182
+LRP1B  7.806407e-163 -0.2948435 0.999 0.999 5.235133e-158
+NRXN1  9.147540e-159 -0.2948524 0.999 1.000 6.134524e-154
+PCDH15 8.149546e-156 -0.3633634 0.996 0.999 5.465248e-151
+NLGN1  2.561706e-144 -0.3163976 0.997 1.000 1.717931e-139
+CST3   2.641508e-144 -1.1411071 0.386 0.669 1.771448e-139
+SYT1   5.661649e-128  0.7647322 0.888 0.772 3.796815e-123
+ADGRL3 1.567842e-119 -0.2959625 0.996 0.999 1.051426e-114
+ERBB4  4.991471e-115 -0.3670282 0.991 0.997 3.347381e-110
+
+> 
+> 
+> proc.time()
+   user  system elapsed 
+352.332  69.084 422.421 

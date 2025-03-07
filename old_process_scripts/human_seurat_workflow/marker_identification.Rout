@@ -1,0 +1,81 @@
+
+R version 4.3.1 (2023-06-16) -- "Beagle Scouts"
+Copyright (C) 2023 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> #looking at and making markers 
+> library(devtools)
+Loading required package: usethis
+> devtools::install_github('immunogenomics/presto')
+Skipping install of 'presto' from a github remote, the SHA1 (7636b3d0) has not changed since last install.
+  Use `force = TRUE` to force installation
+> library(Seurat)
+Loading required package: SeuratObject
+Loading required package: sp
+
+Attaching package: ‘SeuratObject’
+
+The following objects are masked from ‘package:base’:
+
+    intersect, t
+
+> library(tidyverse)
+── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.4     ✔ readr     2.1.5
+✔ forcats   1.0.0     ✔ stringr   1.5.1
+✔ ggplot2   3.5.1     ✔ tibble    3.2.1
+✔ lubridate 1.9.3     ✔ tidyr     1.3.1
+✔ purrr     1.0.2     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+> #
+> 
+> load("suerat.merged.scsorter.umap.RData")
+> 
+> Idents(object = human.combined) <- "sorted_cells"
+> markers_cell_types <- FindAllMarkers(human.combined, min.pct = 0.1, logfc.threshold = 0.5)
+Calculating cluster Unknown
+Calculating cluster Gabaergic Neuron
+Calculating cluster Neuron
+Calculating cluster Astrocyte
+Calculating cluster Intercellular Microglia
+Calculating cluster Mature Non-myelinating Oligodendrocyte
+Calculating cluster Glutamatergic Neuron
+Calculating cluster Dopaminergic Neuron
+Calculating cluster Microglia
+Calculating cluster Mature Myelinating Oligodendrocyte
+Calculating cluster Cholinergic Neuron
+Calculating cluster Glycinergic Neuron
+Calculating cluster Serotonergic Neuron
+Calculating cluster Oligodendrocyte Precursor
+> save(markers_cell_types, file = "markers_cell_types.findallamrkers.RData")
+> 
+> 
+> # human.markers <- FindAllMarkers(human.combined, only.pos = TRUE)
+> # human.markers %>%
+> #   group_by(cluster) %>%
+> #   dplyr::filter(avg_log2FC > 2) -> filtered_human.markers
+> # 
+> # write.csv(filtered_human.markers, "human_markers.csv")
+> 
+> proc.time()
+    user   system  elapsed 
+2013.765  631.510 2652.843 
